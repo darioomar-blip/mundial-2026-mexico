@@ -221,34 +221,56 @@ def slide_5():
 
 
 # ============================================================
-# SLIDE 6 — Y eso, justamente, pasó
+# SLIDE 6 — El patrón: local vs neutral
 # ============================================================
 def slide_6():
     fig, ax = base_slide(6)
-    ax.text(5, 11.3, 'Y eso, justamente, pasó',
-            fontsize=30, ha='center', color=VERDE_MX, fontweight='bold')
-    ax.text(5, 10.3, '7 mundiales · 7 octavos · 7 eliminaciones',
-            fontsize=17, ha='center', color=GRIS_TEXTO)
+    ax.text(5, 11.4, 'El patrón que nadie se atreve a decir',
+            fontsize=27, ha='center', color=VERDE_MX, fontweight='bold')
 
-    ediciones = ['1994', '1998', '2002', '2006', '2010', '2014', '2018']
-    y_start = 8.9
-    for i, ed in enumerate(ediciones):
-        y = y_start - i * 0.9
-        ax.text(2.5, y, ed, fontsize=20, color=NEGRO, fontweight='bold',
-                ha='right')
-        ax.text(3.4, y, 'octavos', fontsize=18, color=GRIS_TEXTO)
-        # Rectángulo rojo como "marca de eliminación"
-        ax.add_patch(Rectangle((6.5, y - 0.2), 1.5, 0.5,
-                                facecolor=ROJO_MX, edgecolor='none'))
-        ax.text(7.25, y + 0.05, 'OUT', fontsize=14, ha='center',
+    # ---------- BLOQUE LOCAL (verde) ----------
+    box_local = FancyBboxPatch((0.4, 7.3), 9.2, 2.7,
+                                boxstyle='round,pad=0.1',
+                                facecolor='#E8F3EE', edgecolor=VERDE_MX,
+                                linewidth=1.5)
+    ax.add_patch(box_local)
+    ax.text(0.8, 9.55, '2 veces local', fontsize=22, color=VERDE_MX,
+            fontweight='bold')
+    locales = [('1970', 'CUARTOS'), ('1986', 'CUARTOS')]
+    for i, (ed, res) in enumerate(locales):
+        y = 8.8 - i * 0.7
+        ax.text(1.2, y, ed, fontsize=18, color=NEGRO, fontweight='bold')
+        ax.text(2.4, y, '→', fontsize=18, color=GRIS_TEXTO)
+        ax.text(3.0, y, res, fontsize=18, color=VERDE_MX, fontweight='bold')
+        ax.add_patch(Rectangle((7.5, y - 0.18), 1.7, 0.45,
+                                facecolor=VERDE_MX, edgecolor='none'))
+        ax.text(8.35, y + 0.05, 'PASA', fontsize=13, ha='center',
                 color='white', va='center', fontweight='bold')
 
-    ax.text(5, 1.8, 'No es maldición.', fontsize=24, ha='center',
-            color=NEGRO, fontweight='bold')
-    ax.text(5, 1.1, 'Es regresión a la expectativa.', fontsize=22,
-            ha='center', color=ROJO_MX, fontweight='bold', style='italic')
+    # ---------- BLOQUE NEUTRAL (rojo) ----------
+    box_neutro = FancyBboxPatch((0.4, 1.8), 9.2, 5.1,
+                                 boxstyle='round,pad=0.1',
+                                 facecolor='#FDECEC', edgecolor=ROJO_MX,
+                                 linewidth=1.5)
+    ax.add_patch(box_neutro)
+    ax.text(0.8, 6.45, '7 veces NO local', fontsize=22, color=ROJO_MX,
+            fontweight='bold')
+    neutros = ['1994', '1998', '2002', '2006', '2010', '2014', '2018']
+    for i, ed in enumerate(neutros):
+        y = 5.7 - i * 0.55
+        ax.text(1.2, y, ed, fontsize=16, color=NEGRO, fontweight='bold')
+        ax.text(2.4, y, '→', fontsize=16, color=GRIS_TEXTO)
+        ax.text(3.0, y, 'octavos', fontsize=16, color=GRIS_TEXTO)
+        ax.add_patch(Rectangle((7.5, y - 0.16), 1.7, 0.4,
+                                facecolor=ROJO_MX, edgecolor='none'))
+        ax.text(8.35, y + 0.04, 'OUT', fontsize=12, ha='center',
+                color='white', va='center', fontweight='bold')
 
-    save(fig, '06_eliminaciones')
+    ax.text(5, 1.0, '2026: vuelve a ser local. ¿Coincidencia o patrón?',
+            fontsize=17, ha='center', color=NEGRO, style='italic',
+            fontweight='bold')
+
+    save(fig, '06_patron_local')
 
 
 # ============================================================
