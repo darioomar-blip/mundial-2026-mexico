@@ -294,9 +294,9 @@ def slide_8():
             fontsize=15, ha='center', color=GRIS_TEXTO)
 
     fases = [
-        ('Pasa de grupos', 97.0, VERDE_MX),
-        ('Llega a octavos', 63.7, VERDE_MX),
-        ('SEXTO PARTIDO\n(cuartos)', 30.4, ROJO_MX),
+        ('Pasa de grupos\n(entra a 16avos)', 97.0, VERDE_MX),
+        ('Gana 16avos\n(entra a octavos)', 63.7, VERDE_MX),
+        ('SEXTO PARTIDO\n(cuartos de final)', 30.4, ROJO_MX),
         ('Semifinales', 12.5, '#888888'),
         ('Final', 4.5, '#888888'),
         ('Campeón', 1.5, '#888888'),
