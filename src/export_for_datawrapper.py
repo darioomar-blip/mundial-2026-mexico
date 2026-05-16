@@ -114,17 +114,41 @@ historico.to_csv(OUT / '3_mexico_historico.csv', index=False)
 
 
 # ============================================================
-# 4. FOREST PLOT — Efecto anfitrión con IC 95%
+# 4. EFECTO ANFITRIÓN — Comparación directa Anfitrión vs No anfitrión
+#    (más interpretable que el forest plot)
 # ============================================================
-or_g, ci_g_lo, ci_g_hi = logit['or_grupos']
-or_c, ci_c_lo, ci_c_hi = logit['or_cuartos']
-forest = pd.DataFrame({
-    'Evento': ['Pasa de grupos', 'Llega a cuartos (sexto partido)'],
-    'Odds Ratio': [round(or_g, 2), round(or_c, 2)],
-    'IC 95% inferior': [round(ci_g_lo, 2), round(ci_c_lo, 2)],
-    'IC 95% superior': [round(ci_g_hi, 2), round(ci_c_hi, 2)],
+lg = logit['logit_grupos']
+lc_logit = logit['logit_cuartos']
+elo_mx = 1823
+
+# ELO centrado a 1750 (como está entrenado el modelo)
+x_anf = np.array([[1, elo_mx - 1750, 1]])
+x_no = np.array([[1, elo_mx - 1750, 0]])
+
+p_g_anf = round(lg.predict(x_anf)[0] * 100, 1)
+p_g_no = round(lg.predict(x_no)[0] * 100, 1)
+p_c_anf = round(lc_logit.predict(x_anf)[0] * 100, 1)
+p_c_no = round(lc_logit.predict(x_no)[0] * 100, 1)
+
+# Formato grouped bar chart: una fila por evento, columnas por escenario
+efecto = pd.DataFrame({
+    'Evento': [
+        'Pasa de grupos',
+        'Llega a CUARTOS (sexto partido)',
+    ],
+    'Sin localía (%)': [p_g_no, p_c_no],
+    'Con localía — anfitrión (%)': [p_g_anf, p_c_anf],
+    'Ganancia (pp)': [
+        round(p_g_anf - p_g_no, 1),
+        round(p_c_anf - p_c_no, 1),
+    ],
 })
-forest.to_csv(OUT / '4_efecto_anfitrion_OR.csv', index=False)
+efecto.to_csv(OUT / '4_efecto_anfitrion.csv', index=False)
+
+# Borrar el CSV viejo de forest plot si existe
+viejo = OUT / '4_efecto_anfitrion_OR.csv'
+if viejo.exists():
+    viejo.unlink()
 
 
 # ============================================================

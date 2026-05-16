@@ -76,25 +76,36 @@
 
 ---
 
-## 4️⃣ `4_efecto_anfitrion_OR.csv` — Forest plot del efecto anfitrión
+## 4️⃣ `4_efecto_anfitrion.csv` — Antes vs después de ser anfitrión
 
-**Tipo de gráfico:** **Dot plot con barras de error**.
+**Tipo de gráfico recomendado:** **Grouped column chart** (barras agrupadas verticales).
 
-**Configuración:**
-- Datawrapper tiene un tipo llamado **"Range plot"** o **"Dot plot"** — ideal para forest plots.
-- Eje Y: "Evento"
-- Punto central: "Odds Ratio"
-- Barras: "IC 95% inferior" y "IC 95% superior"
-- **Escala logarítmica** en eje X (importante para Odds Ratios).
-- Línea de referencia en `OR = 1` con etiqueta: *"sin efecto"*.
-- Título: *"¿Cuánto vale ser anfitrión del Mundial?"*
-- Subtítulo: *"Odds Ratio controlando por ELO · Mundiales 1986–2022"*.
+> Cambio respecto a la versión anterior: el forest plot con Odds Ratios era confuso para audiencia general. Ahora se muestra la **comparación directa** de probabilidades para México (ELO 1823) en los dos escenarios: con localía vs sin localía. Mucho más intuitivo.
 
-**Uso:** Slide 7 del carrusel.
+**Datos del CSV:**
 
-**Alternativa más simple** si "Range plot" no convence:
-- **Bar chart simple** con solo "Odds Ratio" en eje X.
-- Anotar el IC 95% como texto debajo de cada barra.
+| Evento | Sin localía | Con localía (anfitrión) | Ganancia |
+|---|---|---|---|
+| Pasa de grupos | 71.7% | 93.1% | +21.4 pp |
+| Llega a cuartos (sexto partido) | 43.7% | 85.9% | +42.2 pp |
+
+**Configuración en Datawrapper:**
+- Eje X (categorías): "Evento"
+- Series Y: "Sin localía (%)" y "Con localía — anfitrión (%)"
+- Color **gris** para "Sin localía", **verde México** para "Con localía".
+- Etiqueta cada barra con su porcentaje (no leyenda flotante).
+- En "Annotate" agrega una nota encima del segundo par de barras: *"+42 puntos porcentuales solo por jugar en casa"*.
+- Título: *"Cuánto vale ser anfitrión, en cifras concretas"*
+- Subtítulo: *"México (ELO 1823) según el modelo logístico controlado por nivel"*.
+
+**Lectura para el slide:** *"Sin localía, México tendría 44% de probabilidad de llegar a cuartos. Como anfitrión, sube a 86%. La diferencia es 42 puntos porcentuales — más que cualquier otra variable del modelo."*
+
+**Uso:** Slide 7 del carrusel (reemplaza el "×7.8" actual con algo más concreto).
+
+**Alternativa visual si quieres impacto extra:**
+Hacer **dos bar charts horizontales separados** (uno para "pasa de grupos", otro para "llega a cuartos"), apilados verticalmente. Cada uno muestra una sola barra que se "rellena" desde la mitad hacia el extremo. Visualmente potente.
+
+**Nota técnica:** Estas probabilidades vienen del modelo logístico del notebook 05 (efecto anfitrión histórico). Son distintas del simulador Montecarlo (notebook 06), que es más conservador (+2 pp en lugar de +42). Las dos respuestas son válidas — capturan cosas distintas. Si lo quieres documentar honestamente en el slide, anota: *"Estimación del modelo histórico. El simulador específico del bracket 2026 da un efecto más conservador (+2 pp)."* Eso te da puntos de credibilidad con perfiles técnicos.
 
 ---
 
