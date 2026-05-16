@@ -1,6 +1,6 @@
 # El Sexto Partido — México en el Mundial 2026
 
-> **México nunca tuvo maldición. Tenía ELO 1750.** Lo que parecía karma era exactamente lo que la estadística predice. En 2026, por primera vez, el modelo le da una probabilidad real al sexto partido.
+> **México nunca tuvo maldición. Tenía ELO 1750.** Lo que parecía karma era exactamente lo que la estadística predice. En 2026, con su ELO más alto y siendo anfitrión por primera vez en 40 años, todas las variables empujan a su favor.
 
 ![Probabilidad de México por fase](outputs/mc_01_mexico_funnel.png)
 
@@ -50,7 +50,7 @@ Analicé 49,329 partidos internacionales (1872-2026) para responder con datos un
 
 2. **Ser anfitrión sube la probabilidad de llegar a cuartos por un factor de ~8 (OR 7.82)** controlando por nivel. IC 95% [2.0, 31.1] — el extremo bajo del IC sigue siendo "duplica las odds".
 
-3. **México 2026 tiene la probabilidad histórica más alta de llegar al sexto partido: 30%.** En el contrafactual "sin localía", baja a 28% (+2 pp del modelo de simulación; el modelo agregado da +42 pp).
+3. **México 2026 llega con 30% de probabilidad de cuartos según el simulador**, dentro del rango histórico (22%–41%). Lo distinto esta vez es el factor anfitrión: el modelo logístico estima que multiplica las odds por ~8. El simulador es más conservador (+2 pp) porque solo aplica el bonus de cancha en los partidos de grupos. Las dos respuestas son válidas y capturan cosas distintas.
 
 4. **México es #12 en probabilidad de ser campeón (1.5%).** Argentina (24.9%), España (22.4%), Francia (16.1%) son los favoritos. Ser anfitrión te ayuda a *avanzar fases*, no a *ganar el título*.
 
@@ -68,7 +68,7 @@ Analicé 49,329 partidos internacionales (1872-2026) para responder con datos un
 
 ### Gráfico 3: México histórico vs 2026
 ![Histórico vs 2026](outputs/mc_03_historico_vs_2026.png)
-*Antes nunca pasaba del 40%. En 2026 el modelo le da 30% — está exactamente donde "el techo" siempre estuvo.*
+*Las probabilidades históricas oscilaron entre 22% (1994) y 41% (2022). En 2026 el modelo da 30% — dentro del rango histórico. Lo distinto en 2026 no es la cifra, sino el factor anfitrión: una variable que México no ha tenido a favor en mundiales modernos.*
 
 ### Gráfico 4: Forest plot del efecto anfitrión
 ![Forest plot](outputs/host_02_forest_plot.png)
