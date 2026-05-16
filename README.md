@@ -77,7 +77,7 @@ Analicé 49,329 partidos internacionales (1872-2026) para responder con datos un
 ## 🚀 Cómo reproducirlo
 
 ```bash
-git clone https://github.com/[usuario]/mundial-2026-mexico.git
+git clone https://github.com/darioomar-blip/mundial-2026-mexico.git
 cd mundial-2026-mexico
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
