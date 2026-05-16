@@ -1,0 +1,26 @@
+# Datos pesados — no subir a Git
+data/raw/*.csv
+data/processed/*.parquet
+data/processed/*.csv
+data/processed/*.json
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Editor
+.vscode/
+.DS_Store
+
+# Documentos privados de planificación (no van al repo público)
+PASOS_PARA_PUBLICAR.md
+post_linkedin.md
+
+# Modelos pickle (se regeneran corriendo los notebooks)
+src/trained_models/
+
+# SÍ subimos los PNG de los gráficos (los usa el README)
+# y SÍ subimos el carrusel terminado
