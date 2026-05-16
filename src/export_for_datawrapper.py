@@ -11,6 +11,7 @@ Datawrapper acepta CSV/TSV directamente:
 
 from pathlib import Path
 import pandas as pd
+import pickle
 
 ROOT = Path(__file__).resolve().parent.parent
 PROCESSED = ROOT / 'data' / 'processed'
@@ -152,25 +153,50 @@ if viejo.exists():
 
 
 # ============================================================
-# 5. GRUPO A — Probabilidades de los 4 equipos
+# 5. PARTIDOS DE MÉXICO EN FASE DE GRUPOS — Probabilidades partido a partido
 # ============================================================
-grupo_a = pd.DataFrame({
-    'Selección': ['México', 'Corea del Sur', 'Rep. Checa', 'Sudáfrica'],
-    'P(pasa grupos) %': [
-        round(df.loc['Mexico', 'Round of 32'] * 100, 1),
-        round(df.loc['South Korea', 'Round of 32'] * 100, 1),
-        round(df.loc['Czech Republic', 'Round of 32'] * 100, 1),
-        round(df.loc['South Africa', 'Round of 32'] * 100, 1),
-    ],
-    'P(cuartos) %': [
-        round(df.loc['Mexico', 'Quarter-final'] * 100, 1),
-        round(df.loc['South Korea', 'Quarter-final'] * 100, 1),
-        round(df.loc['Czech Republic', 'Quarter-final'] * 100, 1),
-        round(df.loc['South Africa', 'Quarter-final'] * 100, 1),
-    ],
-    'ELO actual': [1823, 1759, 1670, 1613],
-})
-grupo_a.to_csv(OUT / '5_grupo_A.csv', index=False)
+# Cargar modelo Poisson entrenado
+import sys
+sys.path.insert(0, str(ROOT))
+from src.poisson_model import match_probabilities
+
+with open(ROOT / 'src' / 'trained_models' / 'poisson_glm.pkl', 'rb') as f:
+    poisson_bundle = pickle.load(f)
+poisson_model = poisson_bundle['model']
+
+# ELOs actuales
+ranking = pd.read_csv(PROCESSED / 'elo_ranking_actual.csv')
+def get_elo(team):
+    return ranking[ranking['team'] == team]['elo_actual'].values[0]
+
+elo_mx = get_elo('Mexico')
+rivales = [
+    ('Sudáfrica', 'South Africa', '11 jun · Azteca'),
+    ('Corea del Sur', 'South Korea', '18 jun · Akron (Zapopan)'),
+    ('Rep. Checa', 'Czech Republic', '24 jun · Azteca'),
+]
+
+filas = []
+for nombre_es, nombre_en, sede in rivales:
+    elo_riv = get_elo(nombre_en)
+    p = match_probabilities(poisson_model, elo_mx, elo_riv, neutral=False)
+    filas.append({
+        'Partido': f'México vs {nombre_es}',
+        'Sede y fecha': sede,
+        'P(gana México) %': round(p['p_home_win'] * 100, 1),
+        'P(empate) %': round(p['p_draw'] * 100, 1),
+        'P(gana rival) %': round(p['p_away_win'] * 100, 1),
+        'Goles esperados México': round(p['lambda_home'], 2),
+        'Goles esperados rival': round(p['lambda_away'], 2),
+    })
+
+partidos_mx = pd.DataFrame(filas)
+partidos_mx.to_csv(OUT / '5_partidos_grupo_A.csv', index=False)
+
+# Borrar el viejo
+viejo = OUT / '5_grupo_A.csv'
+if viejo.exists():
+    viejo.unlink()
 
 
 # ============================================================

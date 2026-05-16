@@ -109,18 +109,42 @@ Hacer **dos bar charts horizontales separados** (uno para "pasa de grupos", otro
 
 ---
 
-## 5️⃣ `5_grupo_A.csv` — Equipos del Grupo A de México
+## 5️⃣ `5_partidos_grupo_A.csv` — Los 3 partidos de México
 
-**Tipo de gráfico:** **Grouped bar chart** (barras agrupadas).
+**Tipo de gráfico recomendado:** **Stacked bar chart horizontal** (barras apiladas al 100%).
 
-**Configuración:**
-- Eje Y: "Selección"
-- Dos series: "P(pasa grupos) %" y "P(cuartos) %"
-- "Color by column" → series con colores distintos (verde para grupos, rojo para cuartos).
-- Título: *"Grupo A del Mundial 2026"*.
-- Subtítulo: *"Probabilidades según el modelo · ELO entre paréntesis"*.
+**Por qué este formato:** una barra por partido, dividida en 3 segmentos de colores (gana México / empate / gana rival). Es el formato clásico que usan medios deportivos para mostrar pronósticos de partidos. Inmediatamente comprensible.
 
-**Uso:** Slide adicional opcional (entre 4 y 5 del carrusel actual), o reemplaza el slide 5 si quieres meter más datos.
+**Datos del CSV:**
+
+| Partido | Sede y fecha | P(gana MX) | P(empate) | P(gana rival) |
+|---|---|---|---|---|
+| México vs Sudáfrica | 11 jun · Azteca | **78.5%** | 14.2% | 7.2% |
+| México vs Corea del Sur | 18 jun · Akron (Zapopan) | **57.3%** | 23.3% | 19.4% |
+| México vs Rep. Checa | 24 jun · Azteca | **70.9%** | 18.0% | 11.0% |
+
+**Configuración en Datawrapper:**
+- Tipo: **"Stacked bar chart"** (no la versión "100% stacked" — los datos ya están en %).
+- Eje Y (etiquetas): "Partido" (sede y fecha como subetiqueta).
+- Series apiladas en este orden y color:
+  - **P(gana México) %** → **verde México** (`#006847`)
+  - **P(empate) %** → **gris** (`#E8E8E8`)
+  - **P(gana rival) %** → **rojo** (`#CE1126`)
+- Activa "Show value labels" para que aparezcan los % dentro de cada segmento.
+- Título: *"Los 3 partidos de México en fase de grupos"*
+- Subtítulo: *"Probabilidades según el modelo Poisson · ELO actual 1823 · Local en los 3"*.
+
+**Lectura para el slide:**
+*"México es favorito en sus 3 partidos. Sudáfrica es el rival más cómodo (78.5%); Corea del Sur el más difícil (solo 57% de probabilidad de ganar). Probabilidad de ganar los 3: 32%."*
+
+**Uso:** Slide 5 (reemplaza el del histórico) o slide adicional entre 4 y 5.
+
+**Bonus opcional:** abajo del gráfico puedes agregar las **expectativas de goles** (λ) como dato curioso:
+- vs Sudáfrica: 2.5 – 0.6
+- vs Corea: 1.8 – 0.9
+- vs Rep. Checa: 2.2 – 0.7
+
+Eso da textura sin saturar el gráfico principal.
 
 ---
 
