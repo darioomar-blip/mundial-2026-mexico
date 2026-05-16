@@ -138,8 +138,8 @@ mundial-2026-mexico/
 
 ## 📬 Contacto
 
-- **LinkedIn:** [tu perfil]
-- **Email:** [tu email]
+- **LinkedIn:** https://www.linkedin.com/in/dario-l-121318160/
+- **Email:** darioomar@icloud.com
 
 ---
 
