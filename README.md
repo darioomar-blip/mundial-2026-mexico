@@ -20,7 +20,7 @@ Analicé 49,257 partidos internacionales (1872-2026) para responder con datos un
 ## 📊 Datos
 
 - **Fuente:** [martj42/international_results](https://github.com/martj42/international_results) — dataset abierto, 49,329 filas (de las cuales 49,257 son partidos ya jugados; los 72 restantes son la fase de grupos del Mundial 2026 ya programada).
-- **Período cubierto:** 154 años (1872 – 2026).
+- **Período cubierto:** 153 años (1872 – 2026).
 - **Partidos de Copa del Mundo:** 964 jugados en 22 ediciones + 72 partidos del calendario 2026 (la simulación usa estos como fixture).
 - **Limitaciones:**
   - Amistosos son ruidosos → uso K-factor menor en el ELO.
