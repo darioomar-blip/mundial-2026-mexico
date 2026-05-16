@@ -8,7 +8,7 @@
 
 ## 📌 Resumen ejecutivo
 
-Analicé 49,329 partidos internacionales (1872-2026) para responder con datos una pregunta cultural en México: ¿la eliminación recurrente en octavos es maldición o promedio estadístico? Con un sistema ELO dinámico + GLM Poisson + 10,000 simulaciones Montecarlo del Mundial 2026, el resultado es claro: **los 7 octavos consecutivos eran el resultado más probable dado el ELO histórico de México (~1750). En 2026, con ELO 1823 y siendo anfitrión, la probabilidad de llegar a cuartos (sexto partido) sube a 30%.**
+Analicé 49,257 partidos internacionales (1872-2026) para responder con datos una pregunta cultural en México: ¿la eliminación recurrente en octavos es maldición o promedio estadístico? Con un sistema ELO dinámico + GLM Poisson + 10,000 simulaciones Montecarlo del Mundial 2026, el resultado es claro: **los 7 octavos consecutivos eran el resultado más probable dado el ELO histórico de México (~1750). En 2026, con ELO 1823 y siendo anfitrión, la probabilidad de llegar a cuartos (sexto partido) sube a 30%.**
 
 ## 🎯 Pregunta de negocio
 
@@ -19,9 +19,9 @@ Analicé 49,329 partidos internacionales (1872-2026) para responder con datos un
 
 ## 📊 Datos
 
-- **Fuente:** [martj42/international_results](https://github.com/martj42/international_results) — 49,329 partidos internacionales 1872-2026.
-- **Período cubierto:** 154 años.
-- **Tamaño:** 49,329 filas × 9 columnas (1,036 son partidos de Copa del Mundo en 23 ediciones).
+- **Fuente:** [martj42/international_results](https://github.com/martj42/international_results) — dataset abierto, 49,329 filas (de las cuales 49,257 son partidos ya jugados; los 72 restantes son la fase de grupos del Mundial 2026 ya programada).
+- **Período cubierto:** 154 años (1872 – 2026).
+- **Partidos de Copa del Mundo:** 964 jugados en 22 ediciones + 72 partidos del calendario 2026 (la simulación usa estos como fixture).
 - **Limitaciones:**
   - Amistosos son ruidosos → uso K-factor menor en el ELO.
   - Formatos de Mundial pre-1986 muy variados → la inferencia de fase solo aplica a mundiales modernos.

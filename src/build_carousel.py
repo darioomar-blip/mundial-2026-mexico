@@ -139,9 +139,9 @@ def slide_3():
                 fontweight='bold')
         ax.text(x, 6.6, label, fontsize=15, ha='center', color=GRIS_TEXTO)
 
-    num_box(2.5, '49,329', 'Partidos\ninternacionales')
+    num_box(2.5, '49,257', 'Partidos\ninternacionales')
     num_box(5.0, '154', 'Años\n(1872 — 2026)')
-    num_box(7.5, '1,036', 'Partidos\nde Mundial')
+    num_box(7.5, '964', 'Partidos\nde Mundial')
 
     ax.text(5, 4.8, 'Dataset abierto:', fontsize=18, ha='center',
             color=GRIS_TEXTO)
