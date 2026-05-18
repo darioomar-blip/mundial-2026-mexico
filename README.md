@@ -23,21 +23,21 @@ Me planteé dos criterios para considerar el proyecto bien hecho:
 
 ## Datos
 
-El dataset es [martj42/international_results](https://github.com/martj42/international_results), un CSV abierto con 49,329 filas. De esas, 49,257 son partidos jugados y los 72 restantes son la fase de grupos del Mundial 2026 ya programada — los uso como fixture en la simulación.
+El dataset es [martj42/international_results](https://github.com/martj42/international_results), un CSV abierto con 49,329 filas. De esas, 49,257 son partidos jugados y los 72 restantes son la fase de grupos del Mundial 2026 ya programada — los uso como calendario base de la simulación.
 
 Cubre 153 años (1872-2026) y 230 selecciones nacionales. Contiene 964 partidos de Copa del Mundo en 22 ediciones disputadas.
 
 Limitaciones honestas:
 
 - Los amistosos meten mucho ruido, así que uso un K-factor menor en el ELO para ese tipo de partidos.
-- Los formatos de Mundial pre-1986 eran tan distintos al actual (round-robins, dos rondas de grupos) que la inferencia de fase solo aplica desde 1986 en adelante.
+- Los formatos de Mundial pre-1986 eran tan distintos al actual (todos contra todos, dos rondas de grupos) que la inferencia de fase solo aplica desde 1986 en adelante.
 - No hay datos de lesiones, forma del 11 titular ni decisiones arbitrales. El modelo predice nivel, no contingencias.
 
 ## Cómo lo hice
 
-El pipeline son seis notebooks numerados, uno tras otro. Cada uno guarda sus salidas para que el siguiente las consuma.
+El flujo son seis notebooks numerados, uno tras otro. Cada uno guarda sus salidas para que el siguiente las consuma.
 
-El **notebook 1** limpia los datos: parsea fechas, unifica nombres de países disueltos (Yugoslavia se vuelve Serbia, la URSS se vuelve Rusia siguiendo la sucesión de FIFA) y etiqueta cada torneo por tier de importancia.
+El **notebook 1** limpia los datos: parsea fechas, unifica nombres de países disueltos (Yugoslavia se vuelve Serbia, la URSS se vuelve Rusia siguiendo la sucesión de FIFA) y etiqueta cada torneo por nivel de importancia.
 
 El **notebook 2** es el EDA. Acá descubrí que la distribución de goles no es exactamente Poisson — está sobre-dispersa (varianza casi 2× la media). Eso técnicamente rompe el supuesto, pero solo si no condicionas por equipo. Lo dejé documentado y seguí adelante.
 
@@ -63,11 +63,11 @@ Cinco cosas. Las pongo en orden de importancia narrativa, no de complejidad téc
 
 **Cinco: lo mismo aplica a los otros dos anfitriones.** USA termina 25 y Canadá 23 en probabilidad de título. El bonus de cancha no convierte un ELO 1715 en candidato a la copa.
 
-Hay un matiz importante que vale la pena explicar. El simulador da una ventaja de localía pequeña para 2026 (+2 puntos porcentuales en P de cuartos), mientras que el modelo logístico estima +42 pp. La diferencia no es contradicción. El logístico captura todos los factores históricos del anfitrión (descanso, bracket favorable, presión positiva), mientras que el simulador solo aplica el bonus en partidos físicamente jugados en suelo propio. Las dos respuestas son legítimas y miden cosas distintas. Reporto ambas.
+Hay un matiz importante que vale la pena explicar. El simulador da una ventaja de localía pequeña para 2026 (+2 puntos porcentuales en P de cuartos), mientras que el modelo logístico estima +42 pp. La diferencia no es contradicción. El logístico captura todos los factores históricos del anfitrión (descanso, cruce favorable en eliminatorias, presión positiva), mientras que el simulador solo aplica el plus en partidos físicamente jugados en suelo propio. Las dos respuestas son legítimas y miden cosas distintas. Reporto ambas.
 
 ## Gráficos principales
 
-El funnel de México por fase ([mc_01](outputs/mc_01_mexico_funnel.png)): de 97% al pasar de grupos, cae a 30% en cuartos y a 1.5% en campeón. Cada salto es un partido eliminatorio.
+El embudo de México por fase ([mc_01](outputs/mc_01_mexico_funnel.png)): de 97% al pasar de grupos, cae a 30% en cuartos y a 1.5% en campeón. Cada salto es un partido eliminatorio.
 
 El ranking de favoritos al título ([mc_02](outputs/mc_02_ranking_campeon.png)): Argentina, España y Francia se llevan más del 60% combinado.
 
@@ -90,7 +90,7 @@ cd data/raw && curl -O https://raw.githubusercontent.com/martj42/international_r
 jupyter notebook notebooks/01_limpieza.ipynb
 ```
 
-## Estructura del repo
+## Estructura del repositorio
 
 ```
 mundial-2026-mexico/
@@ -115,16 +115,16 @@ La primera fue de eficiencia. La primera versión del simulador Montecarlo tarda
 
 La segunda fue de humildad estadística. Descubrí en el EDA que los datos están sobre-dispersos. Mi primer instinto fue pivotar al modelo Negative Binomial. Después entendí que el GLM Poisson resuelve la sobre-dispersión naturalmente cuando condicionas por equipo (porque el ELO captura la heterogeneidad). Los supuestos del modelo se verifican después de los controles, no antes.
 
-La tercera fue la que más me sirvió: comunicar incertidumbre sin esconderla. El modelo logístico y el simulador dan estimaciones distintas del efecto anfitrión (+42 pp vs +2 pp). Mi primer borrador elegía el más impactante. Decidí reportar los dos y explicar la diferencia. Esa decisión es lo que separa un proyecto de portafolio serio de un post sensacionalista.
+La tercera fue la que más me sirvió: comunicar incertidumbre sin esconderla. El modelo logístico y el simulador dan estimaciones distintas del efecto anfitrión (+42 pp vs +2 pp). Mi primer borrador elegía el más impactante. Decidí reportar los dos y explicar la diferencia. Esa decisión es lo que separa un proyecto de portafolio serio de una publicación sensacionalista.
 
 ## Qué sigue
 
-Algunas cosas que dejé fuera por scope, pero que tendría sentido agregar después:
+Algunas cosas que dejé fuera por alcance, pero que tendría sentido agregar después:
 
 - Bootstrap sobre las 10,000 simulaciones para reportar IC 95% sobre cada probabilidad, no solo el punto.
 - Modelo Negative Binomial para verificar si la sobre-dispersión residual cambia algo.
-- Bracket FIFA real cuando se publique el cruce oficial octavos→cuartos.
-- Una versión live que actualice predicciones durante el torneo, agregando xG de FBref como feature.
+- Cruce oficial de FIFA para las eliminatorias cuando se publique la llave completa octavos→cuartos.
+- Una versión en vivo que actualice predicciones durante el torneo, agregando xG de FBref como variable adicional.
 - Modelo Dixon-Coles para corregir el exceso histórico de empates 0-0 y 1-1.
 
 ## Créditos
