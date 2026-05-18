@@ -1,80 +1,81 @@
 # El Sexto Partido — México en el Mundial 2026
 
-> **México nunca tuvo maldición. Tenía ELO 1750.** Lo que parecía karma era exactamente lo que la estadística predice. En 2026, con su ELO más alto y siendo anfitrión por primera vez en 40 años, todas las variables empujan a su favor.
+> México nunca tuvo maldición. Tenía ELO 1750.
 
 ![Probabilidad de México por fase](outputs/mc_01_mexico_funnel.png)
 
----
+## Resumen
 
-## 📌 Resumen ejecutivo
+Cada Mundial es lo mismo. México cae en octavos y empezamos a explicarlo: maldición, FIFA, mentalidad, el técnico, la suerte. Quise responderlo con datos.
 
-Analicé 49,257 partidos internacionales (1872-2026) para responder con datos una pregunta cultural en México: ¿la eliminación recurrente en octavos es maldición o promedio estadístico? Con un sistema ELO dinámico + GLM Poisson + 10,000 simulaciones Montecarlo del Mundial 2026, el resultado es claro: **los 7 octavos consecutivos eran el resultado más probable dado el ELO histórico de México (~1750). En 2026, con ELO 1823 y siendo anfitrión, la probabilidad de llegar a cuartos (sexto partido) sube a 30%.**
+Analicé 49,257 partidos internacionales (1872 a marzo 2026) con tres modelos encadenados: un sistema ELO dinámico, un GLM Poisson para predecir goles y una simulación Montecarlo de 10,000 mundiales completos. La respuesta corta: los 7 octavos consecutivos (1994-2018) eran el resultado más probable dado el nivel histórico de México. No es maldición, es regresión a la expectativa.
 
-## 🎯 Pregunta de negocio
+Para 2026, con su ELO más alto de la historia (1823) y siendo anfitrión 40 años después, el simulador le da 30% de llegar a cuartos. No es récord — en 2018 y 2022 el modelo le daba más. Lo distinto esta vez es la variable que sí mueve la aguja: jugar en casa.
 
-¿La trayectoria del "siempre cae en octavos" es estadísticamente esperable, o requiere explicaciones extra-deportivas? ¿Cuánto cambia ser anfitrión en 2026?
+## La pregunta
 
-- **Hipótesis inicial:** los 7 octavos consecutivos están dentro de lo predicho por el ELO histórico, no son maldición.
-- **Métrica de éxito:** modelo calibrado contra Mundial 2022 (Brier score < 0.32) y respuesta numérica final con intervalos de confianza.
+Más concreto: ¿los 7 octavos consecutivos están dentro de lo que el ELO histórico predice, o requieren una explicación extra-deportiva? Y si ser anfitrión cambia las cosas, ¿cuánto exactamente?
 
-## 📊 Datos
+Me planteé dos criterios para considerar el proyecto bien hecho:
 
-- **Fuente:** [martj42/international_results](https://github.com/martj42/international_results) — dataset abierto, 49,329 filas (de las cuales 49,257 son partidos ya jugados; los 72 restantes son la fase de grupos del Mundial 2026 ya programada).
-- **Período cubierto:** 153 años (1872 – 2026).
-- **Partidos de Copa del Mundo:** 964 jugados en 22 ediciones + 72 partidos del calendario 2026 (la simulación usa estos como fixture).
-- **Limitaciones:**
-  - Amistosos son ruidosos → uso K-factor menor en el ELO.
-  - Formatos de Mundial pre-1986 muy variados → la inferencia de fase solo aplica a mundiales modernos.
-  - Sin datos de lesiones, estado de forma del 11 titular, ni decisiones arbitrales.
+1. Que el modelo se calibrara contra el Mundial 2022 con un Brier score mejor que 0.33 (el baseline trivial). Lo logró: 0.30.
+2. Que la respuesta final viniera con su intervalo de confianza, no como un número mágico.
 
-## 🛠️ Stack técnico
+## Datos
 
-- **Lenguaje:** Python 3.13
-- **Librerías:** pandas, numpy, statsmodels, scipy, matplotlib, seaborn, pyarrow
-- **Herramientas:** Jupyter Notebook + módulos Python reutilizables (`src/elo.py`, `src/poisson_model.py`, `src/montecarlo.py`)
+El dataset es [martj42/international_results](https://github.com/martj42/international_results), un CSV abierto con 49,329 filas. De esas, 49,257 son partidos jugados y los 72 restantes son la fase de grupos del Mundial 2026 ya programada — los uso como fixture en la simulación.
 
-## 🔍 Metodología
+Cubre 153 años (1872-2026) y 230 selecciones nacionales. Contiene 964 partidos de Copa del Mundo en 22 ediciones disputadas.
 
-**6 notebooks encadenados:**
+Limitaciones honestas:
 
-1. **Limpieza** — normalización de países disueltos (USSR→Russia, Yugoslavia→Serbia), etiquetado por tier de torneo, inferencia de fase del Mundial.
-2. **EDA** — distribución de goles vs Poisson teórica, evolución temporal, ranking histórico, primer vistazo a la ventaja de local.
-3. **ELO dinámico** — rating recalculado para cada selección tras cada partido (K=50 para mundiales, 30 continental, 20 eliminatorias, 10 amistosos). Bonus +100 al local. Sanity check: top-5 actual = Argentina, España, Francia, Brasil, Inglaterra ✅.
-4. **GLM Poisson** — `log(λ) = α + β · elo_diff + γ · is_home`. Coeficientes muy significativos. Brier score en backtest Mundial 2022: 0.30 vs 0.33 trivial.
-5. **Efecto anfitrión** — regresión logística con ELO como control. Odds Ratio para "llega a cuartos": **7.82 IC 95% [1.97, 31.12]**, p = 0.0035. El efecto es real y estadísticamente significativo.
-6. **Simulación Montecarlo** — 10,000 simulaciones vectorizadas (1.3s) del Mundial completo con el bracket real 2026. Fase de grupos con calendario FIFA real; bonus de localía aplicado a partidos de los 3 anfitriones en su país.
+- Los amistosos meten mucho ruido, así que uso un K-factor menor en el ELO para ese tipo de partidos.
+- Los formatos de Mundial pre-1986 eran tan distintos al actual (round-robins, dos rondas de grupos) que la inferencia de fase solo aplica desde 1986 en adelante.
+- No hay datos de lesiones, forma del 11 titular ni decisiones arbitrales. El modelo predice nivel, no contingencias.
 
-## 💡 Hallazgos clave
+## Cómo lo hice
 
-1. **No es maldición, es promedio.** En los 7 mundiales 1994-2018, el modelo daba en promedio **30% de probabilidad** de que México se eliminara exactamente en octavos cada vez. La probabilidad combinada de que pasara las 7 veces es alta. Eliminarse en octavos era el resultado individual *más probable* en cada edición.
+El pipeline son seis notebooks numerados, uno tras otro. Cada uno guarda sus salidas para que el siguiente las consuma.
 
-2. **Ser anfitrión sube la probabilidad de llegar a cuartos por un factor de ~8 (OR 7.82)** controlando por nivel. IC 95% [2.0, 31.1] — el extremo bajo del IC sigue siendo "duplica las odds".
+El **notebook 1** limpia los datos: parsea fechas, unifica nombres de países disueltos (Yugoslavia se vuelve Serbia, la URSS se vuelve Rusia siguiendo la sucesión de FIFA) y etiqueta cada torneo por tier de importancia.
 
-3. **México 2026 llega con 30% de probabilidad de cuartos según el simulador**, dentro del rango histórico (22%–41%). Lo distinto esta vez es el factor anfitrión: el modelo logístico estima que multiplica las odds por ~8. El simulador es más conservador (+2 pp) porque solo aplica el bonus de cancha en los partidos de grupos. Las dos respuestas son válidas y capturan cosas distintas.
+El **notebook 2** es el EDA. Acá descubrí que la distribución de goles no es exactamente Poisson — está sobre-dispersa (varianza casi 2× la media). Eso técnicamente rompe el supuesto, pero solo si no condicionas por equipo. Lo dejé documentado y seguí adelante.
 
-4. **México es #12 en probabilidad de ser campeón (1.5%).** Argentina (24.9%), España (22.4%), Francia (16.1%) son los favoritos. Ser anfitrión te ayuda a *avanzar fases*, no a *ganar el título*.
+El **notebook 3** construye el ELO dinámico. Cada partido actualiza el rating de los dos equipos según la diferencia con lo esperado, con K-factor variable (50 para mundiales, 30 para continentales, 20 para eliminatorias, 10 para amistosos) y un bonus de +100 al equipo que juega en casa. Sanity check: el top 5 de ratings actuales termina siendo Argentina, España, Francia, Brasil e Inglaterra. Plausible.
 
-5. **El otro lado del anfitrión:** USA termina #25 y Canadá #23 en P(campeón). El bonus de localía no convierte a un ELO 1715 en favorito al título.
+El **notebook 4** ajusta el modelo Poisson. La fórmula es simple: `log(λ) = α + β · diferencia_de_ELO + γ · es_local`. Solo tres parámetros, pero capturan lo importante. Validé contra los 64 partidos del Mundial 2022 con Brier score (0.30 contra 0.33 del modelo trivial 33/33/33).
 
-## 📈 Visualizaciones destacadas
+El **notebook 5** es donde se contesta la pregunta del proyecto. Hago una regresión logística para aislar el efecto puro de ser anfitrión, usando el ELO como control para no confundir "ser sede" con "ser país fuerte". El resultado: ser anfitrión multiplica las probabilidades de llegar a cuartos por 7.82, con un intervalo de confianza del 95% entre 2.0 y 31.1. Incluso el extremo bajo del intervalo sigue siendo "te duplica las odds".
 
-### Gráfico 1: Probabilidad de México por fase
-![Funnel](outputs/mc_01_mexico_funnel.png)
-*De 97% (pasa grupos) cae a 30% en cuartos y se desploma a 1.5% en campeón. Cada salto es una eliminación esperada.*
+El **notebook 6** corre la simulación. 10,000 mundiales completos con el calendario real de FIFA. La primera versión tardaba cinco minutos por simulación; con vectorización de NumPy (`np.add.at()` y precomputación de coeficientes) bajó a 1.3 segundos. Mismo resultado, 230 veces más rápido.
 
-### Gráfico 2: ¿Quién levanta la copa?
-![Ranking campeón](outputs/mc_02_ranking_campeon.png)
-*Top 15 favoritos al título. México #12 (1.5%).*
+## Lo que encontré
 
-### Gráfico 3: México histórico vs 2026
-![Histórico vs 2026](outputs/mc_03_historico_vs_2026.png)
-*Las probabilidades históricas oscilaron entre 22% (1994) y 41% (2022). En 2026 el modelo da 30% — dentro del rango histórico. Lo distinto en 2026 no es la cifra, sino el factor anfitrión: una variable que México no ha tenido a favor en mundiales modernos.*
+Cinco cosas. Las pongo en orden de importancia narrativa, no de complejidad técnica.
 
-### Gráfico 4: Forest plot del efecto anfitrión
-![Forest plot](outputs/host_02_forest_plot.png)
-*Odds Ratio 7.82 para cuartos, controlando por ELO. p = 0.0035.*
+**Uno: las 7 eliminaciones consecutivas eran lo esperado.** Para cada uno de los 7 mundiales 1994-2018, el modelo le daba a México en promedio 30% de quedarse exactamente en octavos. Era el resultado individual más probable cada vez. Siete veces seguidas no es maldición; es la estadística aburrida funcionando.
 
-## 🚀 Cómo reproducirlo
+**Dos: ser anfitrión mueve la aguja.** El Odds Ratio es 7.82 (IC 95%: 2.0 a 31.1, p = 0.0035). Controlando por nivel del equipo, ser anfitrión multiplica las odds de llegar a cuartos por casi 8. Y dato curioso que valida el modelo desde la historia: las dos veces que México fue anfitrión (1970 y 1986) llegó a cuartos.
+
+**Tres: México 2026 está en zona conocida.** El simulador le da 30% de llegar a cuartos. Está dentro del rango histórico (22% en 1994 a 41% en 2022). Lo que es distinto es la variable nueva: jugar en casa.
+
+**Cuatro: el campeonato sigue lejos.** El modelo da 1.5% de que México sea campeón. Posición 12 del ranking, detrás de las potencias clásicas. Argentina lidera con 24.9%, España con 22.4%, Francia con 16.1%. Ser anfitrión te ayuda a avanzar fases, no a ganar el trofeo.
+
+**Cinco: lo mismo aplica a los otros dos anfitriones.** USA termina 25 y Canadá 23 en probabilidad de título. El bonus de cancha no convierte un ELO 1715 en candidato a la copa.
+
+Hay un matiz importante que vale la pena explicar. El simulador da una ventaja de localía pequeña para 2026 (+2 puntos porcentuales en P de cuartos), mientras que el modelo logístico estima +42 pp. La diferencia no es contradicción. El logístico captura todos los factores históricos del anfitrión (descanso, bracket favorable, presión positiva), mientras que el simulador solo aplica el bonus en partidos físicamente jugados en suelo propio. Las dos respuestas son legítimas y miden cosas distintas. Reporto ambas.
+
+## Gráficos principales
+
+El funnel de México por fase ([mc_01](outputs/mc_01_mexico_funnel.png)): de 97% al pasar de grupos, cae a 30% en cuartos y a 1.5% en campeón. Cada salto es un partido eliminatorio.
+
+El ranking de favoritos al título ([mc_02](outputs/mc_02_ranking_campeon.png)): Argentina, España y Francia se llevan más del 60% combinado.
+
+México histórico vs 2026 ([mc_03](outputs/mc_03_historico_vs_2026.png)): las probabilidades históricas oscilaron entre 22% y 41%. El 30% de 2026 es típico para el modelo. Lo distinto es el contexto.
+
+Forest plot del efecto anfitrión ([host_02](outputs/host_02_forest_plot.png)): OR 7.82 para cuartos con intervalo de confianza visible.
+
+## Reproducir el análisis
 
 ```bash
 git clone https://github.com/darioomar-blip/mundial-2026-mexico.git
@@ -82,65 +83,55 @@ cd mundial-2026-mexico
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# Descargar dataset
+# Descargar el dataset (no se versiona)
 cd data/raw && curl -O https://raw.githubusercontent.com/martj42/international_results/master/results.csv && cd ../..
 
-# Ejecutar pipeline
+# Abrir el primero, los demás van en orden
 jupyter notebook notebooks/01_limpieza.ipynb
-# ... y los siguientes 02_eda.ipynb hasta 06_simulacion_mundial_2026.ipynb
 ```
 
-## 📁 Estructura del repo
+## Estructura del repo
 
 ```
 mundial-2026-mexico/
 ├── data/
-│   ├── raw/                          # results.csv, shootouts.csv, goalscorers.csv
-│   └── processed/                    # outputs limpios (parquet, csv, json)
-├── notebooks/
-│   ├── 01_limpieza.ipynb
-│   ├── 02_eda.ipynb
-│   ├── 03_elo_ratings.ipynb
-│   ├── 04_modelo_poisson.ipynb
-│   ├── 05_efecto_anfitrion.ipynb
-│   └── 06_simulacion_mundial_2026.ipynb
-├── src/                              # Funciones reutilizables
-│   ├── elo.py                        # Sistema ELO
-│   ├── poisson_model.py              # GLM Poisson
-│   ├── montecarlo.py                 # Simulador vectorizado
-│   └── trained_models/               # Modelos pickle
-├── outputs/                          # Gráficos PNG
-├── requirements.txt
-└── README.md
+│   ├── raw/                  # CSVs originales (no versionados)
+│   └── processed/            # Salidas de limpieza
+├── notebooks/                # 6 notebooks numerados, en orden
+├── src/                      # Código reutilizable
+│   ├── elo.py
+│   ├── poisson_model.py
+│   ├── montecarlo.py
+│   └── build_carousel.py
+├── outputs/                  # Gráficos PNG + carrusel de LinkedIn
+└── requirements.txt
 ```
 
-## 🧠 Qué aprendí
+## Lo que aprendí
 
-- **Vectorización numpy es vida**: pasé el simulador Montecarlo de ~5 min a 1.3 segundos con `np.add.at()` + pre-computar λ. Lección: si tu loop es Python puro, hay 100× de speedup escondidos.
-- **Sobre-dispersión del Poisson**: descubrí en el EDA que var/media = 1.81. Tuve que rectificar el discurso teórico — el GLM resuelve la sobre-dispersión *si* condicionas por equipo (el ELO actúa como condicionante).
-- **merge_asof**: el join temporal de pandas (te da el ELO más reciente *antes* del partido, vectorizado). Magia.
-- **Brier score como métrica de calibración**: aprendí que accuracy no sirve cuando predices probabilidades. Mejor reportar Brier + curva de calibración + IC, no números mágicos.
-- **Comunicar incertidumbre honestamente**: la diferencia entre el efecto anfitrión del modelo logístico (+42 pp) y del simulador (+2 pp) no es contradicción — capturan cosas distintas. El proyecto reporta ambos y deja al lector decidir.
+Tres cosas concretas, una más importante que el código.
 
-## 🔮 Próximos pasos
+La primera fue de eficiencia. La primera versión del simulador Montecarlo tardaba cinco minutos en correr 10,000 mundiales. Lo bajé a 1.3 segundos cambiando los loops Python por operaciones vectorizadas con `np.add.at()` y precomputando los coeficientes que no cambian entre simulaciones. 230× más rápido, mismo resultado. Lección: cuando un loop en Python se siente lento, casi siempre hay una versión vectorizada escondida.
 
-- **Bootstrap** sobre las simulaciones para reportar IC 95% sobre P(cuartos) en lugar de un solo número.
-- **Modelo Negative Binomial** si la sobre-dispersión residual lo justifica.
-- **Bracket FIFA real** una vez se publique el cruce oficial octavos→cuartos.
-- **Re-correr durante el torneo** actualizando ELO con cada partido — predicciones en vivo.
-- **Modelo Dixon-Coles** que corrige el exceso de empates 0-0 / 1-1.
+La segunda fue de humildad estadística. Descubrí en el EDA que los datos están sobre-dispersos. Mi primer instinto fue pivotar al modelo Negative Binomial. Después entendí que el GLM Poisson resuelve la sobre-dispersión naturalmente cuando condicionas por equipo (porque el ELO captura la heterogeneidad). Los supuestos del modelo se verifican después de los controles, no antes.
 
-## 🤖 Herramientas y créditos
+La tercera fue la que más me sirvió: comunicar incertidumbre sin esconderla. El modelo logístico y el simulador dan estimaciones distintas del efecto anfitrión (+42 pp vs +2 pp). Mi primer borrador elegía el más impactante. Decidí reportar los dos y explicar la diferencia. Esa decisión es lo que separa un proyecto de portafolio serio de un post sensacionalista.
 
-- **Dataset:** [martj42/international_results](https://github.com/martj42/international_results) — Mart Jürisoo (licencia abierta).
-- **Copiloto del desarrollo:** [Claude](https://claude.ai) (Anthropic). Lo usé como par de programación para iterar rápido en código, discutir decisiones de modelado (¿usar efectos fijos por equipo o ELO diff?), y refinar la comunicación de hallazgos. Cada decisión técnica fue revisada y validada por mí.
-- **Modelado y narrativa:** mías. Las limitaciones, sesgos y honestidad estadística (la sobre-dispersión, los IC anchos, la diferencia entre los dos modelos de efecto anfitrión) son parte del trabajo, no errores que se ocultan.
+## Qué sigue
 
-## 📬 Contacto
+Algunas cosas que dejé fuera por scope, pero que tendría sentido agregar después:
 
-- **LinkedIn:** https://www.linkedin.com/in/dario-l-121318160/
-- **Email:** darioomar@icloud.com
+- Bootstrap sobre las 10,000 simulaciones para reportar IC 95% sobre cada probabilidad, no solo el punto.
+- Modelo Negative Binomial para verificar si la sobre-dispersión residual cambia algo.
+- Bracket FIFA real cuando se publique el cruce oficial octavos→cuartos.
+- Una versión live que actualice predicciones durante el torneo, agregando xG de FBref como feature.
+- Modelo Dixon-Coles para corregir el exceso histórico de empates 0-0 y 1-1.
 
----
+## Créditos
 
-*Proyecto desarrollado como parte de mi portafolio de análisis de datos. Sin patrocinios, sin afiliación con FIFA ni con la FMF.*
+El dataset es de Mart Jürisoo (licencia abierta). Usé Claude (Anthropic) como copiloto para iterar más rápido en código y discutir decisiones de modelado. Cada decisión técnica fue revisada y validada por mí; el modelado, las limitaciones documentadas y la narrativa son mías.
+
+## Contacto
+
+- LinkedIn: https://www.linkedin.com/in/dario-l-121318160/
+- Email: darioomar@icloud.com
